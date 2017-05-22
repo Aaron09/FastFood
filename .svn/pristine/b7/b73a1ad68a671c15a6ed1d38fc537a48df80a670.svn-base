@@ -1,0 +1,108 @@
+package com.aarongreen.fastfood.ReviewActivityFiles;
+
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.aarongreen.fastfood.DestinationActivityFiles.Destination;
+import com.aarongreen.fastfood.FirebaseHelper;
+import com.aarongreen.fastfood.R;
+
+import java.util.ArrayList;
+
+/**
+ * Created by AaronGreen on 4/9/17.
+ *
+ * Adapter class for the putting the Review views into the Recycler View
+ */
+
+public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder> {
+
+    ArrayList<Review> reviews;
+    Destination currentDestination;
+
+    public ReviewAdapter(ArrayList<Review> reviews, Destination currentDestination) {
+        this.reviews = reviews;
+        this.currentDestination = currentDestination;
+    }
+
+    /**
+     * Called to create the ViewHolder, attaching a review view to it
+     *
+     * @param parent the parent ViewGroup to which the particular view belongs
+     * @param viewType the type of the particular view
+     * @return A ViewHolder containing the review view
+     */
+    @Override
+    public ReviewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        final View reviewItem = LayoutInflater.from(parent.getContext()).
+                inflate(R.layout.review_item, parent, false);
+        return new ViewHolder(reviewItem);
+    }
+
+    /**
+     * Called when the view holder is bound, setting the UI elements of the held review view
+     *
+     * @param holder the ViewHolder containing the review view
+     * @param position the position of the review in the list of Reviews
+     */
+    @Override
+    public void onBindViewHolder(final ReviewAdapter.ViewHolder holder, int position) {
+        final Review review = reviews.get(position);
+        holder.reviewTextView.setText(review.getReviewText());
+        holder.voteTotalTextView.setText(String.valueOf(review.getVoteTotal()));
+
+        // incrememnts upvotes, updates the textview, and sends the update to firebase
+        holder.thumbsUpImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                review.incrementUpvotes();
+                holder.voteTotalTextView.setText(String.valueOf(review.getVoteTotal()));
+                FirebaseHelper.updateReviewInFirebase(currentDestination, review);
+            }
+        });
+
+        // increments downvotes, updates the textview, and sends the update to firebase
+        holder.thumbsDownImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                review.incrementDownvotes();
+                holder.voteTotalTextView.setText(String.valueOf(review.getVoteTotal()));
+                FirebaseHelper.updateReviewInFirebase(currentDestination, review);
+            }
+        });
+    }
+
+    /**
+     *
+     * @return the number of reviews
+     */
+    @Override
+    public int getItemCount() {
+        return reviews.size();
+    }
+
+    /**
+     * A class to hold the UI information about the review view it contains
+     */
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView reviewTextView;
+        public LinearLayout upvoteDownvoteLayout;
+        public TextView voteTotalTextView;
+        public ImageView thumbsUpImage;
+        public ImageView thumbsDownImage;
+
+        public ViewHolder(View reviewView) {
+            super(reviewView);
+            reviewTextView = (TextView) reviewView.findViewById(R.id.reviewTextView);
+            upvoteDownvoteLayout = (LinearLayout)  reviewView.findViewById(R.id.upvoteDownvoteLayout);
+            voteTotalTextView = (TextView) upvoteDownvoteLayout.findViewById(R.id.voteTotalTextView);
+            thumbsUpImage = (ImageView) upvoteDownvoteLayout.findViewById(R.id.thumbsUpImage);
+            thumbsDownImage = (ImageView) upvoteDownvoteLayout.findViewById(R.id.thumbsDownImage);
+        }
+    }
+}

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "478949141226",
+    "firebase_url": "https://fastfood-1491527980272.firebaseio.com",
+    "project_id": "fastfood-1491527980272",
+    "storage_bucket": "fastfood-1491527980272.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:478949141226:android:8da8477270bb809c",
+        "android_client_info": {
+          "package_name": "com.aarongreen.fastfood"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "478949141226-rmgu2ajf863e6k3qhthqkta2uchfnuk5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuMSYI83CRzj4V7GtFzadr29uqv4VK_2A"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

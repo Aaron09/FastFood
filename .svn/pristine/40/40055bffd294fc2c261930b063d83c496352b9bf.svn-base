@@ -1,0 +1,29 @@
+package com.aarongreen.fastfood;
+
+import com.aarongreen.fastfood.DestinationActivityFiles.Destination;
+import com.aarongreen.fastfood.ReviewActivityFiles.Review;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+/**
+ * Created by AaronGreen on 4/9/17.
+ *
+ * Class with helper functions for maintaining the state of the Firebase database
+ */
+
+public class FirebaseHelper {
+
+    /**
+     * Takes the current destination and current review, establishes a reference with the
+     * Firebase database, and updates the review in the database with the one passed in.
+     *
+     * @param destination the current destination
+     * @param review the current review
+     */
+    public static void updateReviewInFirebase(Destination destination, Review review) {
+        String destinationKey = destination.getLocationIdentifier();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
+                .getReference(destinationKey).child(String.valueOf(review.getTimeCreated()));
+        databaseReference.setValue(review);
+    }
+}

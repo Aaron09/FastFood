@@ -1,0 +1,89 @@
+package com.aarongreen.fastfood.DestinationActivityFiles;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.HashMap;
+
+/**
+ * Created by AaronGreen on 4/6/17.
+ *
+ * The class which holds the information received from the GooglePlaces API request for an
+ * individual destination / restaurant.
+ */
+
+public class Destination implements Parcelable {
+
+    public static final String RATING_PREFIX = "Rating: ";
+    public static final String PRICE_PREFIX = "Price Level: ";
+    public static final String DESTINATION_KEY = "DESTINATION";
+
+    private static final String LOCATION = "location";
+    private static final String LATITUDE = "lat";
+    private static final String LONGITUDE = "lng";
+
+    private HashMap<String, HashMap<String, Object>> geometry;
+    private String name;
+    private double price_level;
+    private double rating;
+
+    public double getLatitude() {
+        return (Double) geometry.get(LOCATION).get(LATITUDE);
+    }
+
+    public double getLongitude() {
+        return (Double) geometry.get(LOCATION).get(LONGITUDE);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getPrice_level() {
+        return price_level;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public String getLocationIdentifier() {
+        return (name + getLatitude() + getLongitude()).replaceAll("[.#$]", "");
+    }
+
+    /**
+     * The following methods allow the object to be used as a Parcel between activities
+     */
+
+    protected Destination(Parcel in) {
+        this.name = in.readString();
+        this.rating = in.readDouble();
+        this.price_level = in.readDouble();
+        this.geometry = in.readHashMap(HashMap.class.getClassLoader());
+    }
+
+    public static final Creator<Destination> CREATOR = new Creator<Destination>() {
+        @Override
+        public Destination createFromParcel(Parcel in) {
+            return new Destination(in);
+        }
+
+        @Override
+        public Destination[] newArray(int size) {
+            return new Destination[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(name);
+        parcel.writeDouble(rating);
+        parcel.writeDouble(price_level);
+        parcel.writeMap(geometry);
+    }
+}

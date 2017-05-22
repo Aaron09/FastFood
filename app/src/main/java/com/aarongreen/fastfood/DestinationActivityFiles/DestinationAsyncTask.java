@@ -1,0 +1,87 @@
+package com.aarongreen.fastfood.DestinationActivityFiles;
+
+import android.content.Context;
+import android.location.Location;
+import android.os.AsyncTask;
+import android.widget.Toast;
+
+import com.aarongreen.fastfood.MainActivityFiles.MainActivity;
+
+import java.net.URL;
+import java.util.ArrayList;
+
+/**
+ * Created by AaronGreen on 4/6/17.
+ *
+ * An AsyncTask for getting Destinations from the GooglePlaces API
+ */
+
+public class DestinationAsyncTask extends AsyncTask<URL, Void, ArrayList<Destination>> {
+
+    private double currentLatitude;
+    private double currentLongitude;
+    private DestinationAdapter destinationAdapter;
+    private Context context;
+    private MainActivity.REQUEST_TYPE requestType;
+    private ArrayList<Destination> destinations;
+    private DestinationCollection destinationCollection;
+
+    public DestinationAsyncTask(Context context, DestinationAdapter destinationAdapter,
+                                Location location, MainActivity.REQUEST_TYPE requestType,
+                                ArrayList<Destination> destinations) {
+        this.context = context;
+        this.destinationAdapter = destinationAdapter;
+        this.currentLatitude = (location == null) ?
+                DestinationRetriever.DEFAULT_POSITION_VALUE : location.getLatitude();
+        this.currentLongitude = (location == null) ?
+                DestinationRetriever.DEFAULT_POSITION_VALUE : location.getLongitude();
+        this.requestType = requestType;
+        this.destinations = destinations;
+    }
+
+    /**
+     * Performed on a separate thread from the UI to retrieve Destination information from the
+     * Google Places API
+     *
+     * @param params the URL's to which the API request is made
+     * @return the list of Destinations retrieved from the API request
+     */
+    @Override
+    protected ArrayList<Destination> doInBackground(final URL... params) {
+        try {
+            // where params[0] is the base google places url
+            DestinationRetriever destinationRetriever = new DestinationRetriever(
+                    context, params[0].toString(), currentLatitude,
+                    currentLongitude, requestType);
+            destinationCollection = destinationRetriever.getNearbyDestinations();
+
+            // null occurs when the user does not have an internet connection and uses the app
+            if (destinationCollection == null) {
+                return new ArrayList<>();
+            } else {
+                return destinationCollection.getDestinationsAsArrayList();
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
+    /**
+     *
+     * Called after the API request is completed and notifies the DestinationAdapter that the
+     * information has been received.
+     *
+     * @param retrievedDestinations the list of Destinations retrieved from the API request
+     */
+    @Override
+    protected void onPostExecute(ArrayList<Destination> retrievedDestinations) {
+        if (destinations == null) {
+            Toast.makeText(context, "Failed to retrieve movies.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        for (Destination destination : retrievedDestinations) {
+            destinations.add(destination);
+        }
+        destinationAdapter.notifyDataSetChanged();
+    }
+}

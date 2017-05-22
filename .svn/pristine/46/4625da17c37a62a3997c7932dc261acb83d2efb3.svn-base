@@ -1,0 +1,106 @@
+package com.aarongreen.fastfood.ReviewActivityFiles;
+
+import android.util.Log;
+
+import com.aarongreen.fastfood.DestinationActivityFiles.Destination;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+/**
+ * Created by AaronGreen on 4/9/17.
+ *
+ * Class for retrieving reviews from the Firebase database and notifying the ReviewAdapter
+ */
+
+public class ReviewRetriever {
+
+    private static final String DATABASE_ERROR_TAG = "Database Error";
+    private static final String DATABASE_ERROR_LOG = "Error retrieving data from firebase";
+
+    private static final String DOWNVOTES = "downvotes";
+    private static final String UPVOTES = "upvotes";
+    private static final String REVIEW_TEXT = "reviewText";
+    private static final String TIME_CREATED = "timeCreated";
+
+    private ReviewAdapter reviewAdapter;
+    private ArrayList<Review> reviews;
+
+    public ReviewRetriever(ReviewAdapter reviewAdapter, ArrayList<Review> reviews) {
+        this.reviewAdapter = reviewAdapter;
+        this.reviews = reviews;
+    }
+
+    /**
+     *
+     * This function connects to the Firebase database, using the identifier of the chosen location,
+     * and loads all of the reviews from the database. The function adds only the new reviews by
+     * using the size of the current review list as the starting index. Each of the new reviews
+     * is added to the list, and the adapter is notified of the change.
+     *
+     * @param destination the destination chosen by the user to view
+     */
+    public void getReviewsFromFirebase(Destination destination) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().
+                getReference(destination.getLocationIdentifier());
+
+        // detects a change in the state of the data in the database
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                // hashmap containing all of the hashmaps of the reviews
+                HashMap<String, HashMap<String, Object>> receivedReviews =
+                        (HashMap) dataSnapshot.getValue();
+
+                if (receivedReviews != null) {
+                    addReviewsToCurrentList(receivedReviews);
+                    reviewAdapter.notifyDataSetChanged();
+                }
+            }
+
+            /**
+             * Occurs if the database cannot be reached for any given reason
+             *
+             * @param databaseError the error returned by the database
+             */
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(DATABASE_ERROR_TAG, DATABASE_ERROR_LOG);
+            }
+        });
+    }
+
+    /**
+     * Adds all of the newly received reviews to the list
+     *
+     * Since the key to each hashmap is the time it was created, which we don't
+     * know, we take all of the values of the maps, and then loop through each,
+     * thus bypassing the initial time key into each map
+     *
+     * @param receivedReviews a hashmap containing all of the hashmaps of the reviews
+     */
+    public void addReviewsToCurrentList(HashMap<String, HashMap<String, Object>> receivedReviews) {
+        HashMap[] allReviews = receivedReviews.values().toArray(new HashMap[]{});
+
+        for (int reviewIndex = reviews.size();
+             reviewIndex < allReviews.length;
+             reviewIndex++) {
+            HashMap<String, Object> currentReview = allReviews[reviewIndex];
+
+            String reviewText = (String) currentReview.get(REVIEW_TEXT);
+            long timeCreated = (long) currentReview.get(TIME_CREATED);
+            long upvotes = (long) currentReview.get(UPVOTES);
+            long downvotes = (long) currentReview.get(DOWNVOTES);
+
+            Review review = new Review(reviewText, timeCreated, upvotes, downvotes);
+
+            reviews.add(review);
+        }
+    }
+}

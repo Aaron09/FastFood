@@ -1,0 +1,89 @@
+package com.aarongreen.fastfood.CustomListenerFiles;
+
+import android.content.Context;
+import android.widget.TextView;
+
+import com.aarongreen.fastfood.ReviewActivityFiles.Review;
+import com.aarongreen.fastfood.ReviewActivityFiles.ReviewAdapter;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by AaronGreen on 4/16/17.
+ *
+ * A listener to firebase for vote changes on a given review
+ */
+
+public class FirebaseVoteListener implements ChildEventListener {
+
+    private Review review;
+    private String voteType;
+    private TextView voteTotalTextView;
+    private Context context;
+
+    public FirebaseVoteListener(Review review, String voteType, TextView voteTotalTextView,
+                                Context context) {
+        this.review = review;
+        this.voteType = voteType;
+        this.voteTotalTextView = voteTotalTextView;
+        this.context = context;
+    }
+
+    /**
+     * Receives the data snapshots regarding child additions in the database, adding the newly
+     * received child to the locally maintained list
+     *
+     * @param dataSnapshot a snapshot of the data where the child was added in firebase
+     * @param s the child previous to the newly added child
+     */
+    @Override
+    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+        String deviceID = (String) dataSnapshot.getValue();
+
+        if (voteType.equals(Review.UPVOTES)) {
+            review.appendToUpvoteList(deviceID);
+        } else if (voteType.equals(Review.DOWNVOTES)) {
+            review.appendToDownvoteList(deviceID);
+        }
+
+        voteTotalTextView.setText(Long.toString(review.getVoteTotal()));
+    }
+
+    /**
+     * Receives the data snapshots regarding child removal changes in the database, removing the
+     * appropriate item from the locally maintained list
+     *
+     * @param dataSnapshot a snapshot of the data where the child was removed, INCLUDING the
+     *                     removed child
+     */
+    @Override
+    public void onChildRemoved(DataSnapshot dataSnapshot) {
+        String deviceID = (String) dataSnapshot.getValue();
+
+        if (voteType.equals(Review.UPVOTES)) {
+            review.removeFromUpvoteList(deviceID);
+        } else if (voteType.equals(Review.DOWNVOTES)) {
+            review.removeFromDownvoteList(deviceID);
+        }
+
+        voteTotalTextView.setText(Long.toString(review.getVoteTotal()));
+    }
+
+    /**
+     * Below are the unused Firebase ChildListener methods. There are unimplemented and unecessary
+     * for the current implementation.
+     */
+
+    @Override
+    public void onChildChanged(DataSnapshot dataSnapshot, String s) {/* Unused */}
+
+    @Override
+    public void onChildMoved(DataSnapshot dataSnapshot, String s) {/* Unused */}
+
+    @Override
+    public void onCancelled(DatabaseError databaseError) {/* Unused */}
+}

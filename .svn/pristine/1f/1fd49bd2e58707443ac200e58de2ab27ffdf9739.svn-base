@@ -1,0 +1,103 @@
+package com.aarongreen.fastfood.ReviewActivityFiles;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Created by AaronGreen on 4/9/17.
+ *
+ * Class which holds the information about a single review, which is to be stored in the Firebase
+ * Database
+ */
+
+public class Review {
+
+    public static final String UPVOTES = "upvotes";
+    public static final String DOWNVOTES = "downvotes";
+
+    private String reviewText;
+    private long timeCreated;
+    private String parentRestaurantID;
+    private List<String> upvoteList;
+    private List<String> downvoteList;
+
+    /**
+     * Used to build a new Review object
+     *
+     * @param reviewText the content of the new review
+     */
+    public Review(String reviewText, String parentRestaurantID) {
+        this.reviewText = reviewText;
+        this.timeCreated = System.currentTimeMillis();
+        this.parentRestaurantID = parentRestaurantID;
+        this.upvoteList = new ArrayList<>();
+        this.downvoteList = new ArrayList<>();
+    }
+
+    /**
+     * Used to build review objects when retrieved from the Firebase database
+     *
+     * @param reviewText the content of the review
+     * @param timeCreated the time the review was initially created
+     * @param parentRestaurantID the restaurant to which the review belongs
+     */
+    public Review(String reviewText, long timeCreated, List<String> upvoteList,
+                  List<String> downvoteList, String parentRestaurantID) {
+        this.reviewText = reviewText;
+        this.timeCreated = timeCreated;
+        this.parentRestaurantID = parentRestaurantID;
+        this.upvoteList = upvoteList;
+        this.downvoteList = downvoteList;
+    }
+
+    /**
+     * Default constructor to allow Firebase uploads
+     */
+    public Review() {
+
+    }
+
+    public List<String> getUpvoteList() {
+        return upvoteList;
+    }
+
+    public void setUpvoteList(List<String> upvoteList) {
+        this.upvoteList = upvoteList;
+    }
+
+    public void setDownvoteList(List<String> downvoteList) {
+        this.downvoteList = downvoteList;
+    }
+
+    public List<String> getDownvoteList() {
+        return downvoteList;
+    }
+
+    public long getTimeCreated() {
+        return timeCreated;
+    }
+
+    public String getReviewText() {
+        return reviewText;
+    }
+
+    public void setReviewText(String reviewText) {
+        this.reviewText = reviewText;
+    }
+
+    /**
+     * If upvotes or downvotes are null, use a length of 0 in their place
+     *
+     * @return the difference between upvotes and downvotes
+     */
+    public long getVoteTotal() {
+        long upvoteSize = (upvoteList == null) ? 0 : upvoteList.size();
+        long downvoteSize = (downvoteList == null) ? 0 : downvoteList.size();
+        return (upvoteSize - downvoteSize);
+    }
+
+    public String getParentRestaurantID() {
+        return parentRestaurantID;
+    }
+}

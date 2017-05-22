@@ -1,0 +1,89 @@
+package com.aarongreen.fastfood.DestinationActivityFiles;
+
+import android.util.Log;
+
+import com.aarongreen.fastfood.API_KEYS;
+import com.aarongreen.fastfood.DestinationActivityFiles.DestinationCollection;
+import com.aarongreen.fastfood.MainActivityFiles.MainActivity;
+import com.google.gson.Gson;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+
+/**
+ * Created by AaronGreen on 4/6/17.
+ *
+ * This class makes an HTTP request to the Google Places API to get the JSON for the nearby
+ * restaurants
+ */
+
+public class DestinationRetriever {
+
+    public static final double DEFAULT_POSITION_VALUE = 0.0;
+    public static final String FAILURE_MESSAGE = "Failed to retrieve data from source.";
+    public static final String BASE_URL =
+            "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=";
+
+    private static final String RESTAURANTS_STRING = "restaurant";
+    private static final String BARS_STRING = "bar";
+    private static final String DELIVERY_STRING = "meal_delivery";
+    private static final int RADIUS = 10000; // in meters
+
+    /**
+     *
+     * @param baseURL the URL to which we make the API request without the latitude and longitude
+     *                and API keys
+     * @param latitude the current latitude of the user's device
+     * @param longitude the current longitude of the user's device
+     * @return a DestinationCollection object containing the JSON received in the API request
+     */
+    public static DestinationCollection getNearbyDestinations(String baseURL, double latitude,
+                                                              double longitude,
+                                                              MainActivity.REQUEST_TYPE requestType) {
+        String requestTypeString = null;
+        switch (requestType) {
+            case RESTAURANTS:
+                requestTypeString = RESTAURANTS_STRING;
+                break;
+            case BARS:
+                requestTypeString = BARS_STRING;
+                break;
+            case DELIVERY:
+                requestTypeString = DELIVERY_STRING;
+                break;
+        }
+
+        final String COMPLETE_URL = baseURL + latitude + "," + longitude +
+                "&radius=" + RADIUS + "&type=" + requestTypeString + "&key=" +
+                API_KEYS.GOOGLE_PLACES_KEY;
+        Log.d("URL", COMPLETE_URL); // for code review location display purposes
+        Gson gson = new Gson();
+        return gson.fromJson(getJSONFromURL(COMPLETE_URL), DestinationCollection.class);
+    }
+
+    /**
+     *
+     * @param urlString the URL in String form that contains the Destination data in JSON form
+     * @return the JSON retrieved from the API request as a String
+     */
+    private static String getJSONFromURL(String urlString) {
+        try {
+            URL url = new URL(urlString);
+
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(url.openStream()));
+
+            String jsonAsString = "";
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                jsonAsString += line;
+            }
+            bufferedReader.close();
+
+            return jsonAsString;
+        } catch (IOException e) {
+            return "";
+        }
+    }
+}

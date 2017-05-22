@@ -1,0 +1,82 @@
+package com.aarongreen.fastfood.ReviewActivityFiles;
+
+/**
+ * Created by AaronGreen on 4/9/17.
+ *
+ * Class which holds the information about a single review, which is to be stored in the Firebase
+ * Database
+ */
+
+public class Review {
+
+    private String reviewText;
+    private long upvotes;
+    private long downvotes;
+    private long timeCreated;
+
+    /**
+     * Used to build a new Review object
+     *
+     * @param reviewText the content of the new review
+     */
+    public Review(String reviewText) {
+        this.upvotes = 0;
+        this.downvotes = 0;
+        this.reviewText = reviewText;
+        this.timeCreated = System.currentTimeMillis();
+    }
+
+    /**
+     * Used to build review objects when retrieved from the Firebase database
+     *
+     * @param reviewText the content of the review
+     * @param timeCreated the time the review was initially created
+     * @param upvotes the amount of upvotes of the review
+     * @param downvotes the amount of downvotes of the review
+     */
+    public Review(String reviewText, long timeCreated, long upvotes, long downvotes) {
+        this.reviewText = reviewText;
+        this.timeCreated = timeCreated;
+        this.upvotes = upvotes;
+        this.downvotes = downvotes;
+    }
+
+    /**
+     * Default constructor to allow Firebase uploads
+     */
+    public Review() {
+
+    }
+
+    public long getTimeCreated() {
+        return timeCreated;
+    }
+
+    public String getReviewText() {
+        return reviewText;
+    }
+
+    public void setReviewText(String reviewText) {
+        this.reviewText = reviewText;
+    }
+
+    public long getUpvotes() {
+        return upvotes;
+    }
+
+    public long getDownvotes() {
+        return downvotes;
+    }
+
+    public void incrementUpvotes() {
+        upvotes += 1;
+    }
+
+    public void incrementDownvotes() {
+        downvotes += 1;
+    }
+
+    public long getVoteTotal() {
+        return (upvotes - downvotes);
+    }
+}

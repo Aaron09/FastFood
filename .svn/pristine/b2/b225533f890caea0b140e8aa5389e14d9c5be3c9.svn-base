@@ -1,0 +1,121 @@
+package com.aarongreen.fastfood.ReviewActivityFiles;
+
+import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.aarongreen.fastfood.DestinationActivityFiles.Destination;
+import com.aarongreen.fastfood.FirebaseVoteListener;
+import com.aarongreen.fastfood.LocalVoteListener;
+import com.aarongreen.fastfood.R;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+
+
+/**
+ * Created by AaronGreen on 4/9/17.
+ *
+ * Adapter class for the putting the Review views into the Recycler View
+ */
+
+public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder> {
+
+    ArrayList<Review> reviews;
+    Destination currentDestination;
+    Context context;
+
+    public ReviewAdapter(Context context, ArrayList<Review> reviews, Destination currentDestination) {
+        this.context = context;
+        this.reviews = reviews;
+        this.currentDestination = currentDestination;
+    }
+
+    /**
+     * Called to create the ViewHolder, attaching a review view to it
+     *
+     * @param parent the parent ViewGroup to which the particular view belongs
+     * @param viewType the type of the particular view
+     * @return A ViewHolder containing the review view
+     */
+    @Override
+    public ReviewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        final View reviewItem = LayoutInflater.from(parent.getContext()).
+                inflate(R.layout.review_item, parent, false);
+        return new ViewHolder(reviewItem);
+    }
+
+    /**
+     * Called when the view holder is bound, setting the UI elements of the held review view and the
+     * appropriate listeners
+     *
+     * @param holder the ViewHolder containing the review view
+     * @param position the position of the review in the list of Reviews
+     */
+    @Override
+    public void onBindViewHolder(final ReviewAdapter.ViewHolder holder, int position) {
+        final Review review = reviews.get(position);
+
+        holder.reviewTextView.setText(review.getReviewText());
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
+                .getReference(review.getParentRestaurantID())
+                .child(Long.toString(review.getTimeCreated()));
+
+        // listener for firebase upvote changes
+        databaseReference.child(Review.UPVOTES)
+                .addChildEventListener(new FirebaseVoteListener(review, Review.UPVOTES,
+                        holder.voteTotalTextView, context));
+
+        // listener for firebase downvote changes
+        databaseReference.child(Review.DOWNVOTES)
+                .addChildEventListener(new FirebaseVoteListener(review, Review.DOWNVOTES,
+                        holder.voteTotalTextView, context));
+
+        // listener for local upvotes
+        holder.thumbsUpImage.setOnClickListener(
+                new LocalVoteListener(currentDestination, review, Review.UPVOTES,
+                        holder.voteTotalTextView, context));
+
+        // listener for local downvotes
+        holder.thumbsDownImage.setOnClickListener(
+                new LocalVoteListener(currentDestination, review, Review.DOWNVOTES,
+                        holder.voteTotalTextView, context));
+    }
+
+    /**
+     *
+     * @return the number of reviews
+     */
+    @Override
+    public int getItemCount() {
+        return reviews.size();
+    }
+
+    /**
+     * A class to hold the UI information about the review view it contains
+     */
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView reviewTextView;
+        public LinearLayout upvoteDownvoteLayout;
+        public TextView voteTotalTextView;
+        public ImageView thumbsUpImage;
+        public ImageView thumbsDownImage;
+
+        public ViewHolder(View reviewView) {
+            super(reviewView);
+            reviewTextView = (TextView) reviewView.findViewById(R.id.reviewTextView);
+            upvoteDownvoteLayout = (LinearLayout)  reviewView.findViewById(R.id.upvoteDownvoteLayout);
+            voteTotalTextView = (TextView) upvoteDownvoteLayout.findViewById(R.id.voteTotalTextView);
+            thumbsUpImage = (ImageView) upvoteDownvoteLayout.findViewById(R.id.thumbsUpImage);
+            thumbsDownImage = (ImageView) upvoteDownvoteLayout.findViewById(R.id.thumbsDownImage);
+        }
+    }
+}

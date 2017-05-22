@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/reviewTextView"
+        android:layout_width="368dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textSize="18sp"
+        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras quis erat viverra, laoreet urna non, fermentum ex. Proin sit amet erat eget lorem venenatis interdum sit amet at mi. In volutpat leo quis neque convallis, eget lacinia urna imperdiet. Nam sit amet nibh vitae ligula tempor malesuada. Donec posuere lacinia velit et rutrum. Suspendisse potenti. Nulla dictum consectetur purus. Sed rutrum, leo in scelerisque euismod, lorem turpis ullamcorper diam, sed iaculis mauris enim non ex. Ut pretium velit quis malesuada sagittis. In tempus risus in sem convallis, at molestie elit mattis. Nam eu tortor et dolor iaculis scelerisque. Integer sit amet tortor sed augue varius faucibus eu nec metus."/>
+
+    <LinearLayout
+        android:id="@+id/upvoteDownvoteLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/reviewTextView"
+        app:layout_constraintLeft_toLeftOf="parent">
+
+        <ImageView
+            android:id="@+id/thumbsUpImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/thumbs_up"
+            android:contentDescription="@string/thumbs_up_description"/>
+
+        <TextView
+            android:id="@+id/voteTotalTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="100"
+            android:textSize="20sp"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="10dp"/>
+
+        <ImageView
+            android:id="@+id/thumbsDownImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/thumbs_down"
+            android:contentDescription="@string/thumbs_down_description"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="368dp"
+        android:layout_height="1dp"
+        android:background="#000000"
+        app:layout_constraintBottom_toBottomOf="@+id/upvoteDownvoteLayout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_editor_absoluteX="8dp" />
+
+
+</android.support.constraint.ConstraintLayout>

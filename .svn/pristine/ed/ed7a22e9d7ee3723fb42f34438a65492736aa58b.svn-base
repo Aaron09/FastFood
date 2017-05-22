@@ -1,0 +1,25 @@
+package com.aarongreen.fastfood.ReviewActivityFiles;
+
+import java.util.Comparator;
+
+/**
+ * Created by AaronGreen on 4/10/17.
+ *
+ * Comparator for sorting a list of Review objects by their vote total
+ */
+
+public class ReviewVoteComparator implements Comparator<Review> {
+
+    /**
+     * Result is such that the reviews with the higher vote total appear at the front of the list
+     *
+     * @param firstReview the first review in the comparison
+     * @param secondReview the second review in the comparison
+     * @return how the second review compares the first review
+     */
+    @Override
+    public int compare(Review firstReview, Review secondReview) {
+        return (((Long) secondReview.getVoteTotal())
+                .compareTo(firstReview.getVoteTotal()));
+    }
+}

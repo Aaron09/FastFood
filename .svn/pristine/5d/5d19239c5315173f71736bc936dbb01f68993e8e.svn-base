@@ -1,0 +1,64 @@
+package com.aarongreen.fastfood.DestinationActivityFiles;
+
+import android.content.Intent;
+import android.location.Location;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.widget.Toast;
+
+import com.aarongreen.fastfood.MainActivityFiles.MainActivity;
+import com.aarongreen.fastfood.R;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+
+/**
+ * Created by AaronGreen on 4/8/17.
+ *
+ * The Activity which lists Destinations for the users to view. The destinations are
+ * presented in a recycler view.
+ */
+
+public class DestinationActivity extends AppCompatActivity {
+
+    /**
+     * Connects the UI elements, sets the Recycler view and adapter, and initializes a
+     * DestinationAsyncTask to get the destinations from either the Google Places API or the
+     * Amazon S3 database
+     *
+     * @param savedInstanceState the saved state of the activity
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_destination);
+
+        Intent intent = getIntent();
+        Location currentLocation = intent.getParcelableExtra(MainActivity.LOCATION_KEY);
+        MainActivity.REQUEST_TYPE requestType =
+                (MainActivity.REQUEST_TYPE) intent.getSerializableExtra(MainActivity.REQUEST_TYPE_KEY);
+
+        if (currentLocation == null) {
+            Toast.makeText(this, DestinationRetriever.FAILURE_MESSAGE, Toast.LENGTH_LONG);
+        }
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+
+        ArrayList<Destination> destinations = new ArrayList<>();
+        DestinationAdapter destinationAdapter = new DestinationAdapter(currentLocation, destinations);
+        recyclerView.setAdapter(destinationAdapter);
+
+        try {
+            URL url = new URL(DestinationRetriever.BASE_URL);
+            new DestinationAsyncTask(
+                    this, destinationAdapter, currentLocation, requestType, destinations).execute(url);
+        } catch (MalformedURLException e) {
+            Toast.makeText(this, "Bad URL.", Toast.LENGTH_LONG).show();
+        }
+    }
+}

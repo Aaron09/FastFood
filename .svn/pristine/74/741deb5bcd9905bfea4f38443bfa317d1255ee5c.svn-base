@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">FastFood</string>
+    <string name="get_nearby_restaurants">Get Nearby Restaurants</string>
+    <string name="review_prompt">Enter your Review!</string>
+    <string name="review_help_location">Type your review here</string>
+    <string name="submit">Submit!</string>
+    <string name="cancel">Cancel</string>
+    <string name="thumbs_down_description">Thumbs Down</string>
+    <string name="thumbs_up_description">Thumbs Up</string>
+</resources>
